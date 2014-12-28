@@ -2,6 +2,7 @@ dgram             = require 'dgram'
 {EventEmitter}    = require 'events'
 METHOD_FORCE_FIND = 'force'
 METHOD_ECHO       = 'echo'
+METHOD_FIND       = 'find'
 INTERVAL          = 2000
 MULTICAST_IP      = '239.155.155.150'
 MULTICAST_PORT    = 22000
@@ -35,8 +36,9 @@ class Service  extends EventEmitter
   on_message:(msg, rinfo)=>
     msg = JSON.parse msg.toString()
     ip = rinfo.address
-    return @sendAbout() if msg.method == METHOD_FORCE_FIND  # Force send myself
     return if msg.name == @name                             # Self message
+    return @sendAbout() if msg.method == METHOD_FORCE_FIND  # Force send myself
+    return @sendAbout() if msg.method == METHOD_FIND and msg.query == @name
     @emit msg.name, msg.name, ip, msg.data
     @emit '*', msg.name, ip, msg.data
 
@@ -58,6 +60,20 @@ class Service  extends EventEmitter
     msg=
       method: METHOD_FORCE_FIND
       name: @name
+    msg = new Buffer(JSON.stringify msg)
+    @socket.send msg, 0, msg.length, @port, @ip
+    return this
+
+  ###
+  * Force request descriptions from service with specified name
+  * @param {string} Name of service.
+  * @return {Service} itself
+  ###
+  forceByName:(name)=>
+    msg=
+      method: METHOD_FIND
+      name: @name
+      query: name
     msg = new Buffer(JSON.stringify msg)
     @socket.send msg, 0, msg.length, @port, @ip
     return this

@@ -88,6 +88,18 @@ Force request descriptions from remote services
 
 * return itself
 
+
+## forceByName
+
+```
+forceByName:(name)
+```
+
+Force request descriptions from service with specified name
+
+* `{string} name` Name of service
+* return itself
+
 ## close
 
 ```
@@ -107,4 +119,3 @@ sendAbout:()
 Send self description to multicast group
 
 * return itself
-
