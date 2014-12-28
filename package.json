@@ -1,5 +1,5 @@
 {
-  "name": "node-discovery",
+  "name": "service-discovery",
   "version": "1.0.0",
   "description": "Simple network discovery based on UDP multicast",
   "main": "lib/service.js",

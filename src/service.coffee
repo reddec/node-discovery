@@ -16,8 +16,8 @@ class Service  extends EventEmitter
   * join to muticast
   * @param {string} Name of service. Messages from
   * services with same name will not be catched
-  * @param {string} Multicast IP
   * @param {number} Multicast port
+  * @param {string} Multicast IP
   * @param {number} Sending interval
   ###
   constructor:(@name, @port=MULTICAST_PORT, @ip=MULTICAST_IP, interval = INTERVAL)->
@@ -69,6 +69,7 @@ class Service  extends EventEmitter
   close:() =>
     @removeAllListeners()
     @socket.close()
+    clearInterval @timer
     return this
 
   ###
