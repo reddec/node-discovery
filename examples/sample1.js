@@ -1,20 +1,17 @@
-var Service = require('../lib/service');
+var Description = require('../lib/service').Description;
+var Listener = require('../lib/service').Listener;
+var listener = new Listener();
 
 //Generate unique client name
 var serviceName = 'service-' + Math.random();
 
 //Create new service
-var service = new Service(serviceName);
+var service = new Description(serviceName);
 
 //Add some meta info
-service.add('object1', {
-  author: 'reddec'
-});
+service.attr('author', 'reddec');
 
 //Add listeners for all messages
-service.on('*', function(serviceName, ip, data) {
+listener.on('*', function(serviceName, ip, data) {
   console.log("Service", serviceName, "found from", ip, ":", data);
 });
-
-//Force request info
-service.force();

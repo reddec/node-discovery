@@ -5,117 +5,118 @@ Simple UDP multicast node discovery
 
 Emits events with name of catched service description
 
-Custom event '*' catches all messages (except own or force)
+Custom event '\*' catches all messages (except own or force)
 
 Example
----------------
+-------
 
-```javascript
-var Service = require('service-discovery');
+~~~~ {.javascript}
+var Description = require('../lib/service').Description;
+var Listener = require('../lib/service').Listener;
+
+//Create listener of announced notifications
+var listener = new Listener();
 
 //Generate unique client name
 var serviceName = 'service-' + Math.random();
 
 //Create new service
-var service = new Service(serviceName);
+var service = new Description(serviceName);
 
 //Add some meta info
-service.add('object1', {
-  author: 'reddec'
-});
+service.attr('author', 'reddec');
 
 //Add listeners for all messages
-service.on('*', function(serviceName, ip, data) {
+listener.on('*', function(serviceName, ip, data) {
   console.log("Service", serviceName, "found from", ip, ":", data);
 });
-
-//Force request info
-service.force();
-```
+~~~~
 
 API
-----------------
+---
 
-# Constants
+Constants
+=========
 
-* `MULTICAST_PORT = 22000`
-* `MULTICAST_IP = '239.155.155.150'`
-* `MULTICAST_INTERVAL = 2000`
+-   `MULTICAST_PORT = 22000`
+-   `MULTICAST_IP = '239.155.155.150'`
+-   `MULTICAST_INTERVAL = 2000`
 
-## [constructor]
+class Description
+=================
 
-```
-Service(name, port = MULTICAST_PORT, ip = MULTICAST_IP, interval = INTERVAL)
-```
+Contains description of service and announce it periodically
 
-Create new instance of discovery service, join to muticast and start regular sending
+[constructor]
+-------------
 
-* `name {string}` Name of service. Messages from services with same name will not be catched
-* `port {number}` Multicast port
-* `ip {string}` Multicast IP
-* `interval {number}` Sending interval in ms
+    Description(name, port = MULTICAST_PORT, ip = MULTICAST_IP, interval = INTERVAL)
 
+Create new instance of service description and starts announcing
 
-## on_message
+-   `name {string}` Name of service
+-   `port {number}` Multicast port
+-   `ip {string}` Multicast IP
+-   `interval {number}` Sending interval in ms
 
-```
-on_message: (msg, rinfo)
-```
+attr
+----
 
-Listener for incoming UDP messages
+    attr:(name, data)
 
+Add attribute of description. Same name will be replaced
 
-## add
+-   `name {string}` Name of attribute
+-   `data {object}` Serializeable description
+-   return itself
 
-```
-add:(name, data)
-```
+close
+-----
 
-Add new service (logical) description. Same name will be replaced
+    close:()
 
-* `name {string}` Name of logical service
-* `data {object}` Serializeable description
-* return itself
+Close sockets and remove all listeners and timers
 
+-   return itself
 
-## force
+notify
+------
 
-```
-force:()
-```
-
-Force request descriptions from remote services
-
-* return itself
-
-
-## forceByName
-
-```
-forceByName:(name)
-```
-
-Force request descriptions from service with specified name
-
-* `{string} name` Name of service
-* return itself
-
-## close
-
-```
-close:()
-```
-
-Close sockets and remove all listeners
-
-* return itself
-
-## sendAbout
-
-```
-sendAbout:()
-```
+    notify:()
 
 Send self description to multicast group
 
-* return itself
+-   return itself
+
+class Listener extends EventEmitter
+===================================
+
+Simple service discovery over UDP multicast. Emits events with name of
+catched service description. Custom event '\*' catches all messages
+
+[constructor]
+-------------
+
+    Listener(done, port = MULTICAST_PORT, ip = MULTICAST_IP, interval = INTERVAL)
+
+Create new instance of service finder
+
+-   `done {function(Listener)}` Ready callback
+-   `port {number}` Multicast port
+-   `ip {string}` Multicast IP
+
+on\_message
+-----------
+
+    on_message:(msg, rinfo)
+
+Listener function for incoming UDP messages
+
+close
+-----
+
+    close:()
+
+Close sockets and remove all listeners and timers
+
+-   return itself
